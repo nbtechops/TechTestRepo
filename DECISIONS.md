@@ -13,3 +13,5 @@
  - Code for push to ECR tested
  - Currently same EC2 to build image and run image
  - Postgres DB needs initialised first (so the container must be run twice?)
+ - Jenkins runs on port 8080 
+ - Vibrato App runs on port 3000

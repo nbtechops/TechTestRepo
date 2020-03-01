@@ -41,5 +41,50 @@ techtestapp:latest serve
 ## postgres
 docker run --name pg-docker -e POSTGRES_PASSWORD=xxx -d -p 5432:5432 postgres
 
-## Test DB
-psql -h localhost -U postgres -d postgres
+## utilities
+yum install -y wget \
+    unzip
+
+## EPEL
+yum install -y epel-release 
+
+## Update
+yum update -y
+
+## Docker Install
+yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2
+yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+yum install -y docker-ce \
+    docker-ce-cli \
+    containerd.io
+systemctl start docker
+
+## Install git
+yum install git -y
+
+## Install terraform
+curl -O https://releases.hashicorp.com/terraform/0.12.2/terraform_0.12.2_linux_amd64.zip
+unzip terraform_0.12.2_linux_amd64.zip
+cp terraform /usr/local/bin/
+export PATH=$PATH:/usr/local/bin
+terraform –v
+
+## Jenkins Install
+yum install -y java-1.8.0-openjdk.x86_64
+wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+yum install -y jenkins
+systemctl start jenkins.service
+systemctl enable jenkins.service
+groupadd docker || true
+usermod -aG docker jenkins
+
+## AWS CLI Install
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install
+export PATH=$PATH:/usr/local/bin

@@ -46,7 +46,7 @@ resource "aws_key_pair" "deployer" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-0d0197bb676e60c74"
+  ami           = "ami-00454c61ca928635c"
   instance_type = "t2.medium"
   associate_public_ip_address = "true"
   key_name      = "deployer-key"

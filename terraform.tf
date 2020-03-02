@@ -19,6 +19,7 @@ variable "image_id" {
 
 resource "aws_vpc" "vpc" {
     cidr_block = "10.0.0.0/16"
+    enable_dns_hostnames = true
 
     tags = {
     app = "techtestapp"
@@ -35,7 +36,7 @@ resource "aws_internet_gateway" "igw" {
 
 resource "aws_subnet" "app_subnet" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = "10.0.5.0/24"
+  cidr_block = "10.0.11.0/24"
 
   tags = {
     app = "techtestapp"
@@ -44,7 +45,8 @@ resource "aws_subnet" "app_subnet" {
 
 resource "aws_subnet" "db_subnet_1" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = "10.0.6.0/24"
+  cidr_block = "10.0.12.0/24"
+  availability_zone = "ap-southeast-2a"
 
   tags = {
     app = "techtestapp"
@@ -53,7 +55,8 @@ resource "aws_subnet" "db_subnet_1" {
 
 resource "aws_subnet" "db_subnet_2" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = "10.0.7.0/24"
+  cidr_block = "10.0.13.0/24"
+  availability_zone = "ap-southeast-2b"
 
   tags = {
     app = "techtestapp"
@@ -73,7 +76,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 
 resource "aws_subnet" "elb_subnet" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = "10.0.8.0/24"
+  cidr_block = "10.0.14.0/24"
 
   tags = {
     app = "techtestapp"
@@ -81,6 +84,8 @@ resource "aws_subnet" "elb_subnet" {
 }
 
 resource "aws_security_group" "elb_sg" {
+
+  vpc_id = aws_vpc.vpc.id
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 80
@@ -101,6 +106,8 @@ resource "aws_security_group" "elb_sg" {
 }
 
 resource "aws_security_group" "app_sg" {
+
+  vpc_id = aws_vpc.vpc.id
   ingress {
     security_groups = ["${aws_security_group.elb_sg.id}"]
     from_port   = 3000
@@ -142,6 +149,8 @@ resource "aws_security_group" "app_sg" {
 }
 
 resource "aws_security_group" "db_sg" {
+
+  vpc_id = aws_vpc.vpc.id
   ingress {
     security_groups = ["${aws_security_group.app_sg.id}"]
     from_port   = 5432
@@ -166,7 +175,7 @@ resource "aws_db_instance" "db" {
   publicly_accessible  = "true"
   skip_final_snapshot  = "true"
   vpc_security_group_ids = [ "${aws_security_group.db_sg.id}" ]
-  db_subnet_group_name = aws_db_subnet_group.db_subnet_group.id
+  db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
 
   tags = {
     app = "techtestapp"

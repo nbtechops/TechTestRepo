@@ -20,6 +20,7 @@
 - elb_dnsname
 - jenkins_url
 
-## Features
-- 
+## Network Segmentation
+- Through different subnets for ELB, App and DB
+- Security groups define which ports allowed
 

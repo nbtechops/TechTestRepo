@@ -5,7 +5,7 @@
  - User to install terraform on his machine
  - User to populate tfvars
 
-## Terraform will create EC2
+## Terraform will create EC2, RDS, ELB
  - EC2 instance to have docker, java, AWS CLI, git, jenkins installed
  - EC2 created form pre baked AMI
  - Tried approach for Chef provisioner for EC2 but time consuming - hence pre baked AMI
@@ -15,3 +15,5 @@
  - Postgres DB needs initialised first (so the container must be run twice?)
  - Jenkins runs on port 8080 
  - Vibrato App runs on port 3000
+ - Jenkins has a pre-baked job to recreate init container and service containers after every stipulated time
+ - Terraform will prompt for all input details

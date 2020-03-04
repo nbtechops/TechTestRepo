@@ -13,14 +13,15 @@
 - terraform init
 - terraform plan (supply db_user, db_password and ssh_key)
 - terraform apply (supply db_user, db_password and ssh_key)
+- check the output for URLs for Jenkins, App and ELB. URLs will be accesible within 2-5 mins on specified ports
 
 ## Outputs
-- app_hostname
+- app_hostname (link accessible on port 3000)
 - db_hostname
-- elb_dnsname
-- jenkins_url
+- elb_dnsname (link accessible on port 3000)
+- jenkins_url (link accesible on port 8080)
 
 ## Network Segmentation
-- Through different subnets for ELB, App and DB
+- Through different subnets for App and DB
 - Security groups define which ports allowed
 

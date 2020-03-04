@@ -15,6 +15,9 @@
 - terraform apply (supply db_user, db_password and ssh_key)
 - check the output for URLs for Jenkins, App and ELB. URLs will be accesible within 2-5 mins on specified ports
 
+## Cleanup
+- terraform destroy
+
 ## Outputs
 - app_hostname (link accessible on port 3000)
 - db_hostname

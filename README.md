@@ -9,7 +9,10 @@
 - public key for EC2 (in format "ssh-rsa xxxxxxxxxxxxxxxxxx")
 
 ## Usage
-- `git clone`
+- `git clone https://github.com/nbtechops/TechTestRepo.git`
+- `export AWS_ACCESS_KEY_ID="anaccesskey"`
+- `export AWS_SECRET_ACCESS_KEY="asecretkey"`
+- `export AWS_DEFAULT_REGION="ap-southeast-2"`
 - `terraform init`
 - `terraform plan` (supply db_user, db_password, region and ssh_key)
 - `terraform apply` (supply db_user, db_password, region and ssh_key)

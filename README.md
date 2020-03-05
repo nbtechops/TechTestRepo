@@ -14,6 +14,7 @@
 - `terraform plan` (supply db_user, db_password and ssh_key)
 - `terraform apply` (supply db_user, db_password and ssh_key)
 - check the output for URLs for Jenkins, App and ELB. URLs will be accesible within 2-5 mins on specified ports
+- Must be run in `ap-southeast-2` region, as it uses AMI. For other regions, just copy the public `ami-008783862078c0961` over from `ap-southeast-2` region
 
 ## Cleanup
 - `terraform destroy`
@@ -23,7 +24,7 @@
 - db_hostname (in secured zone, only access through app subnet)
 - elb_dnsname (ELB link accessible on port 3000)
 - jenkins_url (link accesible on port 8080 of EC2)
-- ssh login to EC2 instance: ssh -i <priv_key_file> centos@app_hostname
+- ssh login to EC2 instance: ssh -i `priv_key_file` centos@app_hostname
 
 ## Network Segmentation
 - Through different subnets for App and DB

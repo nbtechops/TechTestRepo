@@ -16,7 +16,7 @@
 - check the output for URLs for Jenkins, App and ELB. URLs will be accesible within 2-5 mins on specified ports
 
 ## Cleanup
-- terraform destroy
+- `terraform destroy`
 
 ## Outputs
 - app_hostname (EC2 link accessible on port 3000)

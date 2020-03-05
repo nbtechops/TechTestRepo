@@ -16,7 +16,7 @@ variable "public_key" {
 
 variable "image_id" {
   type = string
-  default = "ami-0e1b4bc489145b24e"
+  default = "ami-008783862078c0961"
 }
 
 provider "aws" {

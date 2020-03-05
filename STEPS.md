@@ -1,4 +1,4 @@
-# Steps to test app on local docker
+# Steps to test app on local docker and to build AMI
 
 ## Docker build
 docker build . -t techtestapp:latest

@@ -2,17 +2,17 @@
 
 ## Pre-reqs
 - terraform
-- public key for EC2 access (Create a public/private SSH key pair using ssh-keygen -t rsa). Refer https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair
+- public key for EC2 access (Create a public/private SSH key pair using ssh-keygen -t rsa). Refer [ec2-key-pairs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair)
 
 ## Inputs
 - username and password to set for the database
 - public key for EC2 (in format "ssh-rsa xxxxxxxxxxxxxxxxxx")
 
 ## Usage
-- git clone
-- terraform init
-- terraform plan (supply db_user, db_password and ssh_key)
-- terraform apply (supply db_user, db_password and ssh_key)
+- `git clone`
+- `terraform init`
+- `terraform plan` (supply db_user, db_password and ssh_key)
+- `terraform apply` (supply db_user, db_password and ssh_key)
 - check the output for URLs for Jenkins, App and ELB. URLs will be accesible within 2-5 mins on specified ports
 
 ## Cleanup
@@ -30,4 +30,6 @@
 - Security groups define which ports allowed
 
 ## More details
-- Refer to DECISIONS.md
+- Refer to [DECISIONS.md](https://github.com/nbtechops/TechTestRepo/blob/master/DECISIONS.md)
+- AMI Build Steps [STEPS.md](https://github.com/nbtechops/TechTestRepo/blob/master/STEPS.md)
+- Solution design [DESIGN.md](https://github.com/nbtechops/TechTestRepo/blob/master/DESIGN.md)

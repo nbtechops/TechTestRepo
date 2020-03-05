@@ -1,5 +1,5 @@
-provider "aws" {
-  region = "ap-southeast-2"
+variable "desired_region" {
+  type = string
 }
 
 variable "db_user" {
@@ -16,7 +16,15 @@ variable "public_key" {
 
 variable "image_id" {
   type = string
-  default = "ami-008783862078c0961"
+  default = "ami-0e1b4bc489145b24e"
+}
+
+provider "aws" {
+  region = var.desired_region
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
 resource "aws_vpc" "myvpc" {
@@ -45,7 +53,7 @@ resource "aws_internet_gateway" "default" {
 resource "aws_subnet" "db_subnet_1" {
   vpc_id     = aws_vpc.myvpc.id
   cidr_block = "10.0.12.0/24"
-  availability_zone = "ap-southeast-2a"
+  availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
     app = "techtestapp"
@@ -70,7 +78,7 @@ resource "aws_route_table_association" "db_subnet_1_rta" {
 resource "aws_subnet" "db_subnet_2" {
   vpc_id     = aws_vpc.myvpc.id
   cidr_block = "10.0.13.0/24"
-  availability_zone = "ap-southeast-2b"
+  availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     app = "techtestapp"
@@ -136,6 +144,7 @@ resource "aws_db_instance" "db" {
 resource "aws_subnet" "app_subnet" {
   vpc_id     = aws_vpc.myvpc.id
   cidr_block = "10.0.11.0/24"
+  availability_zone = data.aws_availability_zones.available.names[3]
 
   tags = {
     app = "techtestapp"

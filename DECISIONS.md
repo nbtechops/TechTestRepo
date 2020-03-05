@@ -17,3 +17,4 @@
  - Vibrato App runs on port 3000
  - Jenkins has a pre-baked job to recreate init container and service containers after every stipulated time
  - Terraform will prompt for all input details
+ - Hardcoded the region as AMI not available in all regions

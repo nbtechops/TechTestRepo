@@ -16,7 +16,7 @@ variable "public_key" {
 
 variable "image_id" {
   type = string
-  default = "ami-008783862078c0961"
+  default = "ami-0e1b4bc489145b24e"
 }
 
 provider "aws" {
@@ -52,7 +52,7 @@ resource "aws_internet_gateway" "default" {
 
 resource "aws_subnet" "db_subnet_1" {
   vpc_id     = aws_vpc.myvpc.id
-  cidr_block = "10.0.12.0/24"
+  cidr_block = "10.0.1.0/24"
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
@@ -60,7 +60,17 @@ resource "aws_subnet" "db_subnet_1" {
   }
 }
 
-resource "aws_route_table" "db_subnet_1_rt" {
+resource "aws_subnet" "db_subnet_2" {
+  vpc_id     = aws_vpc.myvpc.id
+  cidr_block = "10.0.2.0/24"
+  availability_zone = data.aws_availability_zones.available.names[1]
+
+  tags = {
+    app = "techtestapp"
+  }
+}
+
+resource "aws_route_table" "db_subnet_rt" {
     vpc_id = aws_vpc.myvpc.id
 
     route {
@@ -69,20 +79,14 @@ resource "aws_route_table" "db_subnet_1_rt" {
     }
 }
 
-resource "aws_route_table_association" "db_subnet_1_rta" {
+resource "aws_route_table_association" "db_subnet_rta_1" {
     subnet_id = aws_subnet.db_subnet_1.id
-    route_table_id = aws_route_table.db_subnet_1_rt.id
+    route_table_id = aws_route_table.db_subnet_rt.id
 }
 
-
-resource "aws_subnet" "db_subnet_2" {
-  vpc_id     = aws_vpc.myvpc.id
-  cidr_block = "10.0.13.0/24"
-  availability_zone = data.aws_availability_zones.available.names[1]
-
-  tags = {
-    app = "techtestapp"
-  }
+resource "aws_route_table_association" "db_subnet_rta_2" {
+    subnet_id = aws_subnet.db_subnet_2.id
+    route_table_id = aws_route_table.db_subnet_rt.id
 }
 
 resource "aws_db_subnet_group" "db_subnet_group" {
@@ -141,10 +145,20 @@ resource "aws_db_instance" "db" {
 # APP LAYER
 #
 ########################################
-resource "aws_subnet" "app_subnet" {
+resource "aws_subnet" "app_subnet_1" {
   vpc_id     = aws_vpc.myvpc.id
-  cidr_block = "10.0.11.0/24"
-  availability_zone = data.aws_availability_zones.available.names[2]
+  cidr_block = "10.0.3.0/24"
+  availability_zone = data.aws_availability_zones.available.names[0]
+
+  tags = {
+    app = "techtestapp"
+  }
+}
+
+resource "aws_subnet" "app_subnet_2" {
+  vpc_id     = aws_vpc.myvpc.id
+  cidr_block = "10.0.4.0/24"
+  availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     app = "techtestapp"
@@ -152,7 +166,7 @@ resource "aws_subnet" "app_subnet" {
 }
 
 resource "aws_route_table" "app_subnet_rt" {
-    vpc_id = "${aws_vpc.myvpc.id}"
+    vpc_id = aws_vpc.myvpc.id
 
     route {
         cidr_block = "0.0.0.0/0"
@@ -161,8 +175,13 @@ resource "aws_route_table" "app_subnet_rt" {
 
 }
 
-resource "aws_route_table_association" "app_subnet_rta" {
-    subnet_id = "${aws_subnet.app_subnet.id}"
+resource "aws_route_table_association" "app_subnet_rta_1" {
+    subnet_id = "${aws_subnet.app_subnet_1.id}"
+    route_table_id = "${aws_route_table.app_subnet_rt.id}"
+}
+
+resource "aws_route_table_association" "app_subnet_rta_2" {
+    subnet_id = "${aws_subnet.app_subnet_2.id}"
     route_table_id = "${aws_route_table.app_subnet_rt.id}"
 }
 
@@ -215,13 +234,37 @@ resource "aws_key_pair" "deployer" {
   public_key = var.public_key
 }
 
-resource "aws_instance" "app" {
+resource "aws_instance" "app_1" {
   ami           = var.image_id
   instance_type = "t2.medium"
   associate_public_ip_address = "true"
   vpc_security_group_ids = [ "${aws_security_group.app_sg.id}" ]
   key_name      = "deployer-key"
-  subnet_id     = aws_subnet.app_subnet.id
+  subnet_id     = aws_subnet.app_subnet_1.id
+  user_data      = <<-EOT
+    #!/bin/bash
+    echo "export DB_USER=${aws_db_instance.db.username}" > /tmp/init.sh
+    echo "export DB_PASSWORD=${aws_db_instance.db.password}" >> /tmp/init.sh
+    echo "export DB_HOST=${aws_db_instance.db.address}" >> /tmp/init.sh
+    chmod +x /tmp/init.sh
+EOT    
+#   provisioner "chef" {
+#       client_options  = ["chef_license 'accept'"]
+#       run_list        = ["cookbook::recipe"]
+#   }
+
+  tags = {
+    app = "techtestapp"
+  }
+}
+
+resource "aws_instance" "app_2" {
+  ami           = var.image_id
+  instance_type = "t2.medium"
+  associate_public_ip_address = "true"
+  vpc_security_group_ids = [ "${aws_security_group.app_sg.id}" ]
+  key_name      = "deployer-key"
+  subnet_id     = aws_subnet.app_subnet_2.id
   user_data      = <<-EOT
     #!/bin/bash
     echo "export DB_USER=${aws_db_instance.db.username}" > /tmp/init.sh
@@ -279,7 +322,7 @@ resource "aws_security_group" "elb_sg" {
 resource "aws_elb" "elb" {
   name               = "techtest-elb"
   security_groups    = ["${aws_security_group.elb_sg.id}"]
-  subnets            = [ "${aws_subnet.app_subnet.id}" ]
+  subnets            = [ "${aws_subnet.app_subnet_1.id}", "${aws_subnet.app_subnet_2.id}" ]
 
   listener {
     instance_port     = 3000
@@ -296,7 +339,7 @@ resource "aws_elb" "elb" {
     interval            = 30
   }
 
-  instances                   = ["${aws_instance.app.id}"]
+  instances                   = ["${aws_instance.app_1.id}", "${aws_instance.app_2.id}"]
   cross_zone_load_balancing   = true
   idle_timeout                = 400
   connection_draining         = true
@@ -312,14 +355,22 @@ output "db_hostname" {
   value = "${aws_db_instance.db.address}"
 }
 
-output "ec2_url" {
-  value = "${aws_instance.app.public_dns}:3000"
+output "ec2_url_1" {
+  value = "${aws_instance.app_1.public_dns}:3000"
+}
+
+output "ec2_url_2" {
+  value = "${aws_instance.app_2.public_dns}:3000"
 }
 
 output "elb_url" {
   value = "${aws_elb.elb.dns_name}:3000"
 }
 
-output "jenkins_url" {
-  value = "${aws_instance.app.public_dns}:8080"
+output "jenkins_url_1" {
+  value = "${aws_instance.app_1.public_dns}:8080"
+}
+
+output "jenkins_url_2" {
+  value = "${aws_instance.app_2.public_dns}:8080"
 }
